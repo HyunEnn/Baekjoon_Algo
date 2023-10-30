@@ -66,12 +66,12 @@ public class Main {
 			for(int i=0;i<4;i++) {
 				int nr = p.r + dr[i];
 				int nc = p.c + dc[i];
-				if(nr >= 0 && nr < R && nc >=0 && nc < C) {
-					if(jihoonMap[nr][nc] == 0 && map[nr][nc] != '#') {
-						if(jihoonMap[p.r][p.c] + 1 < fireMap[nr][nc]) {
+				if(nr >= 0 && nr < R && nc >=0 && nc < C) { // 범위 안에 들어가 있으며
+					if(jihoonMap[nr][nc] == 0 && map[nr][nc] != '#') { // 아직 접근하지 않은 구역이면서, 벽이 아니여야 한다
+						if(jihoonMap[p.r][p.c] + 1 < fireMap[nr][nc]) { // 불이 퍼진 순서보다, 지훈이가 먼저 갈수 있으면 이동한다.
 							jihoonMap[nr][nc] = jihoonMap[p.r][p.c] + 1;
 							Q.offer(new Point(nr, nc, p.cnt + 1));							
-						} else if(fireMap[nr][nc] == 0) {
+						} else if(fireMap[nr][nc] == 0) { // 만약에, 불이 없는 곳이면 그냥 접근하면 된다. 
 							jihoonMap[nr][nc] = jihoonMap[p.r][p.c]+1;
 							Q.offer(new Point(nr, nc, p.cnt + 1));
 						}
@@ -85,5 +85,4 @@ public class Main {
 		System.out.println("IMPOSSIBLE");
 		
 	}
-
 }
