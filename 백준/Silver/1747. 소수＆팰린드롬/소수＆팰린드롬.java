@@ -1,4 +1,3 @@
-
 import java.io.*;
 import java.util.*;
 
@@ -19,7 +18,7 @@ public class Main {
 		// 
 		for(int i=2;i<Math.sqrt(arr.length);i++) {
 			if(arr[i] == 0) continue; // 2 부터 시작 -> 2 4 
-			for(int j=i+i;j<arr.length;j+=i) {
+			for(int j=i*i;j<arr.length;j+=i) {
 				arr[j] = 0;
 			}
 		}
