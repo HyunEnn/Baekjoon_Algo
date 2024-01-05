@@ -40,6 +40,7 @@ public class Main {
 		}
 		cnt = 1;
 		seq[R] = cnt;
+		v[R] = true;
 		dfs(R);
 		for(int i=1;i<=N;i++) {
 			System.out.println(seq[i]);
@@ -49,11 +50,12 @@ public class Main {
 	private static void dfs(int idx) {
 		
 		// basis
-		v[idx] = true;
+		
 		// inductive
 			for(int i=0;i<list[idx].size();i++) {
 				int next = list[idx].get(i);
 				if(!v[next]) {
+					v[next] = true;
 					seq[next] = ++cnt;
 					dfs(next);
 			}
