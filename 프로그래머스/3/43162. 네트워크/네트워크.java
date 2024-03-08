@@ -8,26 +8,18 @@ class Solution {
         v = new boolean[n];
         for(int i=0;i<n;i++) {
             if(!v[i]) {
-                bfs(n, computers, i);
-                answer++;    
+                dfs(n, computers, i);
+                answer++;
             }
         }
-        
         return answer;
     }
     
-    public static void bfs(int n, int[][] computers, int idx) {
-        Queue<Integer> Q = new ArrayDeque<>();
+    public static void dfs(int n, int[][] computers, int idx) {
         v[idx] = true;
-        Q.offer(idx);
-        
-        while(!Q.isEmpty()) {
-            int p = Q.poll();
-            for(int i=0;i<n;i++) {
-                if(computers[i][p] == 1 && !v[i]) {
-                    v[i] = true;
-                    Q.offer(i);
-                }
+        for(int i=0;i<n;i++) {
+            if(computers[i][idx] == 1 && !v[i]) {
+                dfs(n, computers, i);
             }
         }
     }
