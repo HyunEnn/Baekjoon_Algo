@@ -1,47 +1,57 @@
+import java.io.*;
+import java.util.*;
+
 class Solution {
-    static boolean[] v;
     static int answer;
-    // 1. compareWord에서 begin, words[i]를 비교한다.
-    // 2. 비교한 값이 1 이하면 교체를 하는데,
-    // 3. 방문 배열 처리 후 dfs 접근
-    // 4. dfs에서 
+    static boolean[] v;
+    static boolean flag;
     public int solution(String begin, String target, String[] words) {
-        answer = Integer.MAX_VALUE;
+        answer = 0;
+        flag = false;
         v = new boolean[words.length];
         for(int i=0;i<words.length;i++) {
-            if(compareWord(begin, words[i]) <= 1) {
+            if(changeWord(begin, words[i]) == 1) {
                 v[i] = true;
-                dfs(i, 1, target, words);
+                bfs(i, begin, target, words);   
             }
         }
-        if(answer == Integer.MAX_VALUE) answer = 0;
+        if(!flag) answer = 0;
         return answer;
+    }
+    
+    public static void bfs(int idx, String begin, String target, String[] words) {
+        Queue<Integer> Q = new ArrayDeque<>();
+        Q.offer(idx);
         
+        while(!Q.isEmpty()) {
+            int size = Q.size();
+            for(int j=0;j<size;j++) {
+                int p = Q.poll();
+                if(words[p].equals(target)) {
+                    flag = true;
+                    break;
+                }
+                    
+                for(int i=0;i<words.length;i++) {
+                   if(!v[i] && changeWord(words[p], words[i]) == 1) {
+                        v[i] = true;
+                        Q.offer(i);
+                    }
+                }
+            }           
+            // for(int x : Q) {
+            //     System.out.print(x + " ");
+            // } System.out.println();
+            answer++;
+        }
     }
     
-    public static void dfs(int idx, int cnt, String target, String[] words) {
-        // basis
-        if(target.equals(words[idx])) {
-            answer = Math.min(answer, cnt);
-            return;
-        }
-        // inductive  i=5 
-        for(int i=0;i<words.length;i++) {
-            if(!v[i] && compareWord(words[idx], words[i]) == 1) {
-                v[i] = true;
-                dfs(i, cnt + 1, target, words);
-                v[i] = false;    
-            }
-        }
-    }
-    
-    public static int compareWord(String begin, String comp) {
+    public static int changeWord(String begin, String word) {
         int cnt = 0;
         for(int i=0;i<begin.length();i++) {
-            if(begin.charAt(i) != comp.charAt(i)) 
+            if(begin.charAt(i) != word.charAt(i)) 
                 cnt++;
         }
         return cnt;
     }
 }
-// 
