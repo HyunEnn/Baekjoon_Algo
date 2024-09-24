@@ -1,40 +1,42 @@
-import java.io.*;
-import java.util.*;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
 
 public class Main {
+    static int N, M;
+    static int[] sel;
+    static boolean[] v;
+    static StringBuilder sb;
+    static StringTokenizer st;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        st = new StringTokenizer(br.readLine());
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+        sel = new int[M];
+        v = new boolean[N+1];
+        sb = new StringBuilder();
+        dfs(0);
+        System.out.println(sb.toString());
+    }
 
-	static int n, s;
-	static boolean[] ch;
-	static int[] arr;
-	public static void main(String[] args) throws IOException {
-		// TODO Auto-generated method stub
-		Scanner sc = new Scanner(System.in);
-		n = sc.nextInt(); // 전체 배열 갯수
-		s = sc.nextInt(); // 뽑을 갯수
-		arr = new int[s];
-		ch = new boolean[n];
-		recursive(0);
-	}
-	private static void recursive(int idx) {
-		// basis
-		if(idx == s) {
-			for(int x : arr) {
-				System.out.print(x + " ");
-			}
-			System.out.println();
-			return;
-		} // 3 , 1 -> 1 2 3
-		// inductive
-		for (int i = 0; i < n; i++) {
-			if(ch[i] == false) {
-				ch[i] = true;
-				arr[idx] = i+1;
-				recursive(idx+1);
-				ch[i] = false;
-			}
-		}
-		
-		
-	}
+    public static void dfs(int idx) {
+        if(idx == M) {
+            for(int i=0;i<sel.length;i++) {
+                sb.append(sel[i]).append(" ");
+            } sb.append("\n");
+            return;
+        }
 
+        for(int i=1;i<=N;i++) {
+            if(!v[i]) {
+                v[i] = true;
+                sel[idx] = i;
+                dfs(idx + 1);
+                v[i] = false;
+            }
+        }
+    }
 }
