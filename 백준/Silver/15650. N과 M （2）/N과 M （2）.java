@@ -1,39 +1,40 @@
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
 
 public class Main {
     static int N, M;
-    static List<Integer> list = new ArrayList<>();
-    static StringTokenizer st;
+    static StringBuilder sb;
     static boolean[] v;
+    static int[] sel;
+    static StringTokenizer st;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        st = new StringTokenizer(br.readLine());
+        StringTokenizer st = new StringTokenizer(br.readLine());
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
-        v = new boolean[N];
-        recursive(0, 0);
+        sel = new int[M];
+        v = new boolean[N+1];
+        sb = new StringBuilder();
+        dfs(0, 1);
+        System.out.println(sb.toString());
     }
 
-    public static void recursive(int cnt, int idx) {
-
-        // basis
-        if(cnt == M) {
-            for(int i : list) {
-                System.out.print(i + " ");
-            }
-            System.out.println();
+    public static void dfs(int idx, int curr) {
+        if(idx == M) {
+            for(int i=0;i<sel.length;i++) {
+                sb.append(sel[i]).append(" ");
+            } sb.append("\n");
             return;
         }
 
-        // inductive
-        for(int i=idx;i<N;i++) {
+        for(int i=curr;i<=N;i++) {
             if(!v[i]) {
                 v[i] = true;
-                list.add(i+1);
-                recursive(cnt + 1, i);
-                list.remove(list.size() - 1);
+                sel[idx] = i;
+                dfs(idx+1, i);
                 v[i] = false;
             }
         }
