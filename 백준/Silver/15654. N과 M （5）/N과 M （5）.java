@@ -1,50 +1,56 @@
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.StringTokenizer;
 
 public class Main {
+    static int N, M;
+    static int[] sel;
+    static int[] arr;
+    static boolean[] v;
+    static StringBuilder sb;
+    static StringTokenizer st;
 
-	static int N, M;
-	static int[] arr;
-	static int[] sel;
-	static boolean[] v;
- 	static StringTokenizer st;
- 	static StringBuilder sb = new StringBuilder();
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		st = new StringTokenizer(br.readLine());
-		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
-		arr = new int[N];
-		sel = new int[M];
-		v = new boolean[N];
-		st = new StringTokenizer(br.readLine());
-		for(int i=0;i<N;i++) {
-			arr[i] = Integer.parseInt(st.nextToken());
-		}
-		Arrays.sort(arr);
-		recursive(0, 0);
-		System.out.println(sb.toString());
-	}
-	private static void recursive(int idx, int k) {
-		// basis
-		if(k == M) {
-			for(int i=0;i<sel.length;i++)
-				sb.append(sel[i] + " ");
-			sb.append("\n");
-			return;
-		}
-		
-		// inductive
-		for(int i=0;i<arr.length;i++) {
-			if(!v[i]) {
-				v[i] = true;
-				sel[k] = arr[i];				
-				recursive(i+1, k+1);
-				v[i] = false;
-			}
-		}
-		
-	}
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        st = new StringTokenizer(br.readLine());
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+        sel = new int[M];
+        arr = new int[N];
+        st = new StringTokenizer(br.readLine());
+        for (int i = 0; i < N; i++) {
+            arr[i] = Integer.parseInt(st.nextToken());
+        }
+        Arrays.sort(arr);
+        sb = new StringBuilder();
+        for (int i = 0; i < N; i++) {
+            v = new boolean[N];
+            sel[0] = arr[i];
+            v[i] = true;
+            dfs(1);
+        }
+        System.out.println(sb.toString());
+    }
 
+    static void dfs(int idx) {
+        if (idx == M) {
+            for (int i = 0; i < sel.length; i++) {
+                sb.append(sel[i]).append(" ");
+            }
+            sb.append("\n");
+            return;
+        }
+
+        for (int i = 0; i < N; i++) {
+            if (!v[i]) {
+                v[i] = true;
+                sel[idx] = arr[i];
+                dfs(idx + 1);
+                v[i] = false;
+            }
+        }
+    }
 }
