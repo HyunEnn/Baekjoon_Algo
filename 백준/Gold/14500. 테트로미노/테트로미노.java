@@ -1,95 +1,73 @@
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
 
 public class Main {
+    static int N, M;
+    static int[][][] tetromino = {{{0,0}, {0,1}, {0,2}, {0,3}}, // 1자 모양 가로
+            {{0,0},{1,0}, {2,0}, {3,0}}, // 세로
+            {{0,0}, {0,1}, {1,0}, {1,1}}, // ㅁ 자 모양
+            {{0,0}, {1,0}, {2,0}, {2,-1}}, // ㄴ자 모양
+            {{0,0}, {1,0}, {2,0}, {2,1}},
+            {{0,0}, {0,-1}, {0,-2}, {1,0}},
+            {{0,0}, {0,1}, {0,2}, {1,0}},
+            {{0,0}, {0,1}, {1,1}, {2,1}},
+            {{0,0}, {0,-1}, {1,-1}, {2,-1}},
+            {{0,0}, {0,-1}, {0,-2}, {-1,0}},
+            {{0,0}, {0,1}, {0,2}, {-1,0}},
+            {{0,0}, {1,0}, {1,1}, {2,1}}, // 네번째 모양
+            {{0,0}, {0,1}, {-1,1}, {-1,2}},
+            {{0,0}, {1,0}, {1,-1}, {2,-1}},
+            {{0,0}, {0,1}, {1,1}, {1,2}},
+            {{0,0}, {0,1}, {0,2}, {1,1}},  // ㅗ
+            {{0,0}, {1,0}, {2,0}, {1,1}},  // ㅏ
+            {{0,0}, {0,1}, {0,2}, {-1,1}}, // ㅜ
+            {{0,0}, {1,0}, {2,0}, {1,-1}}  // ㅓ
+    };
+    static int[][] map;
+    static StringTokenizer st;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        st = new StringTokenizer(br.readLine());
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+        map = new int[N][M];
+        for (int i = 0; i < N; i++) {
+            st = new StringTokenizer(br.readLine());
+            for (int j = 0; j < M; j++) {
+                map[i][j] = Integer.parseInt(st.nextToken());
+            }
+        }
 
-	static int N, M;
-	static int[][] map;
-	static boolean[][] v;
-	static int ans;
-	static int[] dr = {-1, 0, 1, 0};
-	static int[] dc = {0, 1, 0, -1};
-	static StringTokenizer st;
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		st = new StringTokenizer(br.readLine());
-		N = Integer.parseInt(st.nextToken()); // 세로 = 열
- 		M = Integer.parseInt(st.nextToken()); // 가로 = 행
-		map = new int[N][M];
-		v = new boolean[N][M];
-		ans = 0;
-		
-		for(int i=0;i<N;i++) {
-			st = new StringTokenizer(br.readLine());
-			for(int j=0;j<M;j++) {
-				map[i][j] = Integer.parseInt(st.nextToken());
-			}
-		}
-//		printMap();
-		
-		v = new boolean[N][M];
-		for(int i=0;i<N;i++) {
-			for(int j=0;j<M;j++) {
-				v[i][j] = true;
-				dfs(i, j, 1, map[i][j]);
-				v[i][j] = false;
-				exOther(i, j);
-			}
-		}
-		System.out.println(ans);
+        int max = 0;
+        for(int i=0;i<N;i++) {
+            for(int j=0;j<M;j++) {
+                // 1~5번까지 가능한 경우의 수를 모두 계산한다.
+                for(int k=0;k<tetromino.length;k++) {
+                    int sum = 0;
+                    boolean isValid = true;
+                    for(int t=0;t<4;t++) {
+                        int r = i + tetromino[k][t][0];
+                        int c = j + tetromino[k][t][1];
+                        if(inRange(r, c)) {
+                            sum += map[r][c];
+                        } else {
+                            isValid = false;
+                            break;
+                        }
+                    }
+                    if(isValid)
+                        max = Math.max(max, sum);
+                }
+            }
+        }
+        System.out.println(max);
 
-	}
-	private static void printMap() {
-		for(int i=0;i<N;i++) {
-			for(int j=0;j<M;j++) {
-				System.out.print(map[i][j] + " ");
-			}
-			System.out.println();
-		}
-	}
-	
-	private static void exOther(int r, int c) {
-		// ㅏ 모양
-		if(r < N - 2 && c < M- 1) {
-			ans = Math.max(ans, map[r][c] + map[r+1][c] + 
-					map[r+2][c] + map[r+1][c+1]);
-		}
-		// ㅓ 모양
-		if(r < N - 2 && c > 0) {
-			ans = Math.max(ans, map[r][c] + map[r+1][c] +
-					map[r+2][c] + map[r+1][c-1]);
-		}
-		// ㅗ 모양
-		if(r > 0 && c < M - 2) {
-			ans = Math.max(ans, map[r][c] + map[r][c+1] +
-					map[r][c+2] + map[r-1][c+1]);
-		}
-		// ㅜ 모양
-		if(r < N - 1 && c < M - 2) {
-			ans = Math.max(ans, map[r][c] + map[r][c+1] +
-					map[r][c+2] + map[r+1][c+1]);
-		}
-	}
-	private static void dfs(int r, int c, int cnt, int sum) {
-		// basis
-		if(cnt == 4) {
-			ans = Math.max(ans, sum);
-			return;
-		}
-		
-		// inductive 
-		for(int k=0;k<4;k++) {
-			int nr = r + dr[k];
-			int nc = c + dc[k];
-			
-			if(nr < 0 || nr >= N || nc < 0 || nc >= M || v[nr][nc])
-				continue;
-			
-			v[nr][nc] = true;
-			dfs(nr, nc, cnt+1, sum+map[nr][nc]);
-			v[nr][nc] = false;
-		}
-	}
+    }
 
+    public static boolean inRange(int r, int c) {
+        return r >= 0 && r < N && c >= 0 && c < M;
+    }
 }
