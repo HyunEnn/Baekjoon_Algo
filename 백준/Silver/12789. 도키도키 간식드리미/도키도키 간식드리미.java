@@ -21,26 +21,28 @@ public class Main {
             arr[i] = Integer.parseInt(st.nextToken());
         }
 
+        // 5 4 2 1 3  -> stack 5 - 4 - 2
         int idx = 1;
         for(int i=1;i<=N;i++) {
             // 스택의 맨 위가 idx와 같으면 계속 pop
-            while (!stack.isEmpty() && stack.peek() == idx) {
-                stack.pop();
-                idx++;
-            }
 
             if (arr[i] == idx) {
                 idx++; // 바로 간식 받음
             } else {
                 stack.push(arr[i]); // 스택에 추가
             }
+            while (!stack.isEmpty() && stack.peek() == idx) {
+                stack.pop();
+                idx++;
+            }
         }
 
+        // 5 - 4 - 2 - 3 
         // 스택 남아있는 요소 다시 확인
-        while (!stack.isEmpty() && stack.peek() == idx) {
-            stack.pop();
-            idx++;
-        }
+//        while (!stack.isEmpty() && stack.peek() == idx) {
+//            stack.pop();
+//            idx++;
+//        }
 
         if(stack.isEmpty()) System.out.println("Nice");
         else System.out.println("Sad");
