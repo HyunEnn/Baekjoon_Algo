@@ -6,81 +6,106 @@ import java.util.*;
 
 public class Main {
     static class Point {
-        int r, c, move;
-        Point(int r, int c, int move) {
+        int r, c, cnt;
+        Point(int r, int c, int cnt) {
             this.r = r;
             this.c = c;
-            this.move = move;
+            this.cnt = cnt;
+        }
+
+        Point(int r, int c) {
+            this.r = r;
+            this.c = c;
         }
     }
-    static char[][] map;
-    static int N, M;
+    static int R, C;
     static int[] dr = {-1, 0, 1, 0};
     static int[] dc = {0, 1, 0, -1};
-    static Queue<Point> water = new ArrayDeque<>();
-    static Queue<Point> moves = new ArrayDeque<>();
+    static int endR, endC;
+    static Queue<Point> Q = new ArrayDeque<>();
+    static Queue<Point> waters = new ArrayDeque<>();
+    static char[][] map;
+    static boolean[][] v;
     static StringTokenizer st;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
-        int r = 0, c = 0;
-        map = new char[N][M];
-        for(int i=0;i<N;i++) {
+        R = Integer.parseInt(st.nextToken());
+        C = Integer.parseInt(st.nextToken());
+        map = new char[R][C];
+        v = new boolean[R][C];
+        for(int i=0;i<R;i++) {
             String line = br.readLine();
-            for(int j=0;j<M;j++) {
+            for(int j=0;j<C;j++) {
                 map[i][j] = line.charAt(j);
-                if(map[i][j] == '*') water.offer(new Point(i, j, 0)); // 물
-                else if(map[i][j] == 'S') moves.offer(new Point(i, j, 0)); // 고슴도치 위치
+                if(map[i][j] == 'S') {
+                    Q.offer(new Point(i, j, 0));
+                    v[i][j] = true;
+                    map[i][j] = '.';
+                }
                 else if(map[i][j] == 'D') {
-                    r = i; c = j;
+                    endR = i;
+                    endC = j;
+                }
+                else if(map[i][j] == '*') {
+                    waters.offer(new Point(i, j));
                 }
             }
         }
 
-        // 불필요한 게산할 필요 없이, 물 먼저 채우고 고슴도치 이동
-        int cnt = 0;
-        while(!moves.isEmpty()) {
-            int size = water.size();
+        int ans = solve();
+        System.out.println(ans == -1 ? "KAKTUS" : ans);
+
+
+    }
+    
+    static int solve() {
+        // 고슴도치가 먼저 이동하고, 그다음 물이 차오르는 형태로 구현
+        // 물이랑 고슴도치랑 한번씩 bfs 가 진행되야 한다?
+        // 물이 먼저 bfs 돌고, 고슴도치가 돌아간다.
+        boolean flag = false;
+        while(!Q.isEmpty()) {
+            // 현재 들어있는 사이즈 만큼만 순환
+            int size = waters.size();
             for(int i=0;i<size;i++) {
-                Point w = water.poll();
+                Point w = waters.poll();
                 for(int k=0;k<4;k++) {
-                    int wr = w.r + dr[k];
-                    int wc = w.c + dc[k];
-                    if(inRange(wr, wc) && map[wr][wc] == '.') {
-                        map[wr][wc] = '*';
-                        water.offer(new Point(wr, wc, 0));
+                    int nr = w.r + dr[k];
+                    int nc = w.c + dc[k];
+                    // 범위 안에 있고, 평지여야 물을 채움
+                    if(inRange(nr, nc) && map[nr][nc] == '.') {
+                        map[nr][nc] = '*';
+                        waters.offer(new Point(nr, nc));
                     }
                 }
             }
 
-            int moveSize = moves.size();
-            for(int i=0;i<moveSize;i++) {
-                Point p = moves.poll();
+            int gSize = Q.size();
+            for(int i=0;i<gSize;i++) {
+                Point p = Q.poll();
                 for(int k=0;k<4;k++) {
                     int nr = p.r + dr[k];
                     int nc = p.c + dc[k];
-                    if(inRange(nr, nc) && map[nr][nc] == '.') {
-                        map[nr][nc] = 'S';
-                        moves.offer(new Point(nr, nc, p.move + 1));
-                    } else if(inRange(nr, nc) && map[nr][nc] == 'D') {
-                        map[nr][nc] = 'S';
-                        cnt = p.move + 1;
-                        break;
+                    // 범위 안에 있고, 바닥인 지역 이동을 하고, 만일 굴이 나오면 바로 종료
+                    if(inRange(nr, nc) && !v[nr][nc]) {
+                        if(map[nr][nc] == '.') {
+                            v[nr][nc] = true;
+                            Q.offer(new Point(nr, nc, p.cnt + 1));
+                        }
+                        if(map[nr][nc] == 'D') {
+                            return p.cnt + 1;
+                        }
                     }
                 }
             }
         }
 
-        if(map[r][c] == 'D') {
-            System.out.println("KAKTUS");
-        } else {
-            System.out.println(cnt);
-        }
+        // 만약에 고슴도치가 이동못하고 빠지면 KAKUTS 출력하고 바로 종료
+        return -1;
+        // 빠져나왔다면 그 값을 저장하고 종료
     }
 
-    public static boolean inRange(int r, int c) {
-        return r >= 0 && r < N && c >= 0 && c < M;
+    static boolean inRange(int r, int c) {
+        return r >= 0 && r < R && c >= 0 && c < C;
     }
 }
