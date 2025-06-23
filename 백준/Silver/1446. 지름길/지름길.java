@@ -33,14 +33,14 @@ public class Main {
             int s = Integer.parseInt(st.nextToken());
             int e = Integer.parseInt(st.nextToken());
             int cost = Integer.parseInt(st.nextToken());
-            if(e <= D) list[s].add(new Point(s, e, cost));
+            if(s <= D && e <= D && (e-s) > cost) list[s].add(new Point(s, e, cost));
         }
 
         Arrays.fill(dp, Integer.MAX_VALUE);
         dp[0] = 0;
 
         for(int i=0;i<=D;i++) {
-            if(i > 0)
+            if(i > 0 && dp[i-1] != Integer.MAX_VALUE) 
                 dp[i] = Math.min(dp[i], dp[i-1] + 1);
 
             for(Point p : list[i]) {
