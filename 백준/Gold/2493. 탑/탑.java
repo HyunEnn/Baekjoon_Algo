@@ -2,44 +2,33 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class Main {
     static int N;
-    static int[] arr;
-    static int[] answer;
+    static int[] ans;
+    static int[] tops;
     static Stack<Integer> stack = new Stack<>();
     static StringTokenizer st;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         N = Integer.parseInt(br.readLine());
-        arr = new int[N];
-        answer = new int[N];
+        tops = new int[N+1];
+        ans = new int[N+1];
         st = new StringTokenizer(br.readLine());
-        for(int i = 0; i < N; i++) {
-            arr[i] = Integer.parseInt(st.nextToken());
+        for(int i=1;i<=N;i++) {
+            tops[i] = Integer.parseInt(st.nextToken());
         }
 
-        //
-        for(int i = 0; i < N; i++) {
-            while(!stack.isEmpty() && arr[stack.peek()] < arr[i]) {
-                stack.pop();
-            }
-
-            if(!stack.isEmpty()) {
-                answer[i] = stack.peek() + 1;
-            } else {
-                answer[i] = 0;
+        for(int i=N;i>=1;i--) {
+            while(!stack.isEmpty() && tops[i] > tops[stack.peek()]) {
+                ans[stack.pop()] = i;
             }
             stack.push(i);
         }
 
-
-        for(int i=0;i<N;i++) {
-            System.out.print(answer[i] + " ");
+        for(int i=1;i<=N;i++) {
+            System.out.print(ans[i] + " ");
         }
     }
 }
