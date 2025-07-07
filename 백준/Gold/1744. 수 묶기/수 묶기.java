@@ -1,64 +1,76 @@
-import java.io.*;
+
 import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class Main {
+    static int N;
+    static List<Integer> odd = new ArrayList<>(); // 양수
+    static List<Integer> even = new ArrayList<>(); // 음수
+    static int zero = 0, one = 0;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        N = Integer.parseInt(br.readLine());
+        for (int i = 0; i < N; i++) {
+            int a = Integer.parseInt(br.readLine());
+            if(a < 0) even.add(a);
+            else if(a == 0) zero++;
+            else if(a == 1) one++;
+            else odd.add(a);
+        }
 
-	static class soo implements Comparable<soo>{
-		int num;
-		soo(int num) {
-			this.num = num;
-		}
-		
-		@Override
-		public int compareTo(soo o) {
-			return o.num - this.num;
-		}
-	}
-	static int N;
-	static PriorityQueue<soo> FPQ; // 양수 -> 역정렬
-	static PriorityQueue<Integer> LPQ; // 음수 -> 순정렬
-	static int one; // 1일 때
-	static int zero; // 0일 때
-	static int res; // 결과값
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		N = Integer.parseInt(br.readLine());
-		FPQ = new PriorityQueue<>();
-		LPQ = new PriorityQueue<>();
-		res = 0;
-		one = 0;
-		zero = 0;
-		for(int i=0;i<N;i++) {
-			int a = Integer.parseInt(br.readLine());
-			if(a > 1) FPQ.offer(new soo(a));
-			else if(a == 1) one++;
-			else if(a == 0) zero++;
-			else LPQ.offer(a);
-		}
-		
-		while(FPQ.size() > 1) { // 양수 2개 이상인 PQ
-			soo x = FPQ.poll();
-			soo y = FPQ.poll();
-			res += x.num * y.num;
-		}
-		
-		while(!FPQ.isEmpty()) { // 남은 값은 더해줌
-			soo x = FPQ.poll();
-			res += x.num;
-		}
-		
-		while(LPQ.size() > 1) { // 음수 * 음수 = 양수
-			int x = LPQ.poll();
-			int y = LPQ.poll();
-			res += x * y;
-		}
-		
-		if(!LPQ.isEmpty()) {
-			if(zero == 0) res += LPQ.poll();
-		}
-		res += one;
-		System.out.println(res);
-		
-	}
+        even.sort((a, b) -> a - b); // 순정렬
+        odd.sort((a, b) -> b - a); // 역정렬
 
+//        for(int i : even) {
+//            System.out.print(i + " ");
+//        }
+//
+//        System.out.println();
+//        for(int i : odd) {
+//            System.out.print(i + " ");
+//        }
+//        System.out.println();
+//        System.out.println("zero : " + zero);
+//        System.out.println("one : " + one);
+
+        int ans = 0;
+        int peek = 0;
+        while(!even.isEmpty()) {
+            if(peek == 0) {
+                peek = even.get(0);
+                even.remove(0);
+            } else {
+                peek *= even.get(0);
+                even.remove(0);
+                ans += peek;
+                peek = 0;
+            }
+        }
+        if(zero == 0 && peek != 0) ans += peek;
+
+        peek = 0;
+        while(!odd.isEmpty()) {
+            if(peek == 0) {
+                peek = odd.get(0);
+                odd.remove(0);
+            } else {
+                peek *= odd.get(0);
+                odd.remove(0);
+                ans += peek;
+                peek = 0;
+            }
+        }
+
+        ans += one;
+        if(peek != 0) ans += peek;
+
+        System.out.println(ans);
+    }
+    // 양수, 음수를 따로 나눠서 리스트에 저장
+    // 양수는 큰 수를 기반으로 정렬, 음수는 작은 수를 기반으로 정렬
+    // 각 리스트가 1개가 남을때까지 계속 곱해서 결과값에 더해준다.
+    // 각 리스트의 남은 1개의 값들은 더해준다.
+    // ex) -1 2 1 3 -> 6
 }
