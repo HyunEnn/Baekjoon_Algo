@@ -6,8 +6,8 @@ public class Main {
     static char[][] map;
     static int[][] fireTime;
     static int[][] sangkeunTime;
-    static int[] dr = {-1, 0, 1, 0};
-    static int[] dc = {0, 1, 0, -1};
+    static int[] dr = {0, 1, 0, -1};
+    static int[] dc = {1, 0, -1, 0};
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
