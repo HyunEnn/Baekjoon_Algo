@@ -5,77 +5,65 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 public class Main {
-    static class Point implements Comparable<Point> {
-        int u, v, weight;
-        Point(int u, int v, int weight) {
-            this.u = u;
-            this.v = v;
-            this.weight = weight;
-        }
-
-        @Override
-        public int compareTo(Point p) {
-            return this.weight - p.weight;
+    static class Point {
+        int next, val;
+        Point(int next, int val) {
+            this.next = next;
+            this.val = val;
         }
     }
     static int V, E;
-    static int[] parent;
-    static List<Point> edges = new ArrayList<Point>();
+    static List<Point>[] list;
     static StringTokenizer st;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         st = new StringTokenizer(br.readLine());
         V = Integer.parseInt(st.nextToken());
         E = Integer.parseInt(st.nextToken());
-        parent = new int[V+1];
+        list = new List[V + 1];
+        for(int i=1;i<=V;i++) {
+            list[i] = new ArrayList<>();
+        }
         for(int i=0;i<E;i++) {
             st = new StringTokenizer(br.readLine());
-            int u = Integer.parseInt(st.nextToken());
-            int v = Integer.parseInt(st.nextToken());
-            int weight = Integer.parseInt(st.nextToken());
-            edges.add(new Point(u, v, weight));
+            int start = Integer.parseInt(st.nextToken());
+            int end = Integer.parseInt(st.nextToken());
+            int val = Integer.parseInt(st.nextToken());
+            list[start].add(new Point(end, val));
+            list[end].add(new Point(start, val));
         }
 
-        System.out.println(kruskal());
-    }
+        PriorityQueue<Point> PQ = new PriorityQueue<>(
+                (a, b) -> {
+                    if(a.val == b.val) return a.next - b.next;
+                    return Integer.compare(a.val, b.val);
+                }
+        );
+        boolean[] v = new boolean[V + 1];
+        int ans = 0;
+        for(Point p : list[1]) {
+            PQ.offer(new Point(p.next, p.val));
+        }
+        v[1] = true;
 
-    public static int kruskal() {
-        int sum = 0, cnt = 0;
-        Collections.sort(edges); // 간선 정렬
-
-        Arrays.fill(parent, -1);
-
-        for(Point p : edges) {
-            if(cnt == V-1) break; // MST 에서 계산중인 간선 갯수가 정점보다 1개 작으면 종료
-
-            if(union(p.u, p.v)) {
-                sum += p.weight;
-                cnt++;
+        while(!PQ.isEmpty()) {
+            Point p = PQ.poll();
+            if(v[p.next]) continue;
+            for(Point np : list[p.next]) {
+                if(!v[np.next]) PQ.offer(new Point(np.next, np.val));
             }
+            v[p.next] = true;
+            ans += p.val;
         }
 
-        return sum;
+        System.out.println(ans);
     }
-
-    public static int find(int x) {
-        if(parent[x] < 0)
-            return x;
-        return parent[x] = find(parent[x]);
-    }
-
-    public static boolean union(int x, int y) {
-        int u = find(x);
-        int v = find(y);
-
-        if(u == v) return false; // 이미 같은 루트를 지님
-        if(parent[u] > parent[v]) { // u, v 중 u 의 연결 갯수가 더 적다면, 자리를 바꿔주고 union 을 진행
-            int temp = u;
-            u = v;
-            v = temp;
-        }
-
-        parent[u] += parent[v]; // 연결 갯수를 합침
-        parent[v] = u; // 그리고 v의 연결 갯수를 합쳤으니, 부모를 가르키게 설정
-        return true;
-    }
+    /**
+     * 1. 임의의 정점을 선택해 최소 신장 트리에 추가, 해당 정점고 연결된 모든 간선을 우선순위 큐에 추가
+     * 2. 우선순위 큐에서 비용이 가장 작은 간선 추가
+     * 3. 만약, 해당 간선이 최소 신장 트리에 포함된 두 정점이라면 무시한다.
+     * 해당 간선이 최소 신장에 포함된 정점 u와 아닌 정점 v라면, 간선을 연결하고 해당 정점에서 이동가능한 모든 간선들을
+     * 우선순위 큐에 저장한다.
+     * 4. 최소 신장 트리에 V-1개의 간선이 추가될 때까지 2,3번 과정을 반복한다.
+     */
 }
