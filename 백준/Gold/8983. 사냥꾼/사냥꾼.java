@@ -7,7 +7,8 @@ import java.util.*;
 public class Main {
     static int N, M, L;
     static int[] arr;
-    static int[][] animals;
+    static long[][] animals;
+    static int ans;
     static StringTokenizer st;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -16,7 +17,7 @@ public class Main {
         N = Integer.parseInt(st.nextToken());
         L = Integer.parseInt(st.nextToken());
         arr = new int[M];
-        animals = new int[N][2];
+        animals = new long[N][2];
 
         st = new StringTokenizer(br.readLine());
         for(int i=0;i<M;i++) {
@@ -30,19 +31,28 @@ public class Main {
             animals[i][0] = a; animals[i][1] = b;
         }
 
-        Arrays.sort(animals, (a, b) ->
-           Integer.compare(a[0] + a[1], b[0] + b[1])
-        );
+        Arrays.sort(arr);
+//        Arrays.sort(animals, (a, b) ->
+//           Integer.compare(a[0] + a[1], b[0] + b[1])
+//        );
 
-        int ans = 0;
+        ans = 0;
 
         for(int i=0;i<N;i++) {
             // i번째 동물이 갈 수 있는 가장 작은 사대를 찾기
-            int curr = binarySearch(i);
+            if(animals[i][1] > L) continue;
+
+            long remain = L - animals[i][1];
+            int idx = binarySearch(animals[i][0]);
 
             boolean flag = false;
-            // 가장 가까운 사대
-            if(Math.abs(arr[curr] - animals[i][0]) + animals[i][1] <= L) flag = true;
+
+            // 후보 1 : idx 그대로
+            if(idx < M && Math.abs(arr[idx] - animals[i][0]) <= remain) flag = true;
+            // 후보 2 : idx - 1 자리
+            if(!flag && idx > 0) {
+                if (Math.abs(arr[idx - 1] - animals[i][0]) <= remain) flag = true;
+            }
 
             if(flag) ans++;
         }
@@ -55,15 +65,12 @@ public class Main {
 
     }
 
-    private static int binarySearch(int target) {
-        int left = 0, right = arr.length - 1;
+    private static int binarySearch(long target) {
+        int left = 0, right = arr.length;
         while(left < right) {
             int mid = (left + right) / 2;
-            if(Math.abs(animals[target][0] - arr[mid]) + animals[target][1] <= L) {
-                right = mid;
-            } else {
-                left = mid + 1;
-            }
+            if(arr[mid] >= target) right = mid;
+            else left = mid + 1;
         }
 
         return left;
