@@ -1,22 +1,24 @@
-import java.io.*;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 public class Main {
     static class Point {
-        int r,c;
+        int r, c;
         Point(int r, int c) {
             this.r = r;
             this.c = c;
         }
     }
-    static int N,L,R;
-    static int[][] map;
-    static boolean[][] v;
+    static List<Point> list;
+    static int N, L, R;
     static int[] dr = {-1, 0, 1, 0};
     static int[] dc = {0, 1, 0, -1};
-    static List<Point> list;
-    static boolean flag;
-    static int cnt;
+    static boolean[][] v;
+
+    static int[][] map;
     static StringTokenizer st;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -24,81 +26,79 @@ public class Main {
         N = Integer.parseInt(st.nextToken());
         L = Integer.parseInt(st.nextToken());
         R = Integer.parseInt(st.nextToken());
+
         map = new int[N][N];
-        for(int i=0;i<N;i++) {
+        for (int i = 0; i < N; i++) {
             st = new StringTokenizer(br.readLine());
-            for(int j=0;j<N;j++) {
+            for (int j = 0; j < N; j++) {
                 map[i][j] = Integer.parseInt(st.nextToken());
             }
         }
-//        printMap();
-        cnt = 0;
-        list = new ArrayList<>();
-        solve();
-        System.out.println(cnt);
-    }
 
-    /**
-     * 1. 우선, 행열에 대해서 인접한 행렬과 값의 차이가 L <= x <= R이면 큐와 리스트에 넣는다.
-     * 2. 그러면 탐색할 리스트가 모두 정해지면, 그 리스트들을 토대로 sum 값을 구하고, 개수만큼
-     * 나눈 값을, 각 행열의 값으로 처리한다.
-     * 3. 위의 작업을 인접한 행렬과 교환할 일이 없을 때까지 진행한다.
-     */
-    public static void solve() {
+        int ans = 0;
+
         while(true) {
-            flag = false;
+            boolean flag = false;
             v = new boolean[N][N];
-
             for(int i=0;i<N;i++) {
                 for(int j=0;j<N;j++) {
-                    if(!v[i][j])
-                        bfs(i, j);
-                }
-            }
-            if(!flag) break;
-            else cnt++;
-        }
-    }
+                    if(v[i][j]) continue;
 
-    public static void bfs(int r, int c) {
-        Queue<Point> Q = new ArrayDeque<>();
-        v[r][c] = true;
-        Q.offer(new Point(r, c));
-        list.add(new Point(r, c));
+                    list = new ArrayList<>();
+                    v[i][j] = true;
+                    list.add(new Point(i, j));
 
-        while(!Q.isEmpty()) {
-            Point p = Q.poll();
-            for(int i=0;i<4;i++) {
-                int nr = p.r + dr[i];
-                int nc = p.c + dc[i];
-                if(nr >= 0 && nr < N && nc >= 0 && nc < N) {
-                    if(!v[nr][nc] && L <= Math.abs(map[nr][nc] - map[p.r][p.c])
-                            && Math.abs(map[nr][nc] - map[p.r][p.c]) <= R ) {
+                    findDFS(i, j);
+                    // 리스트가 안비었으면, 계산 처리
+                    if(list.size() >= 2) {
+//                        System.out.println(list.size());
+                        calculate();
                         flag = true;
-                        v[nr][nc] = true;
-                        Q.offer(new Point(nr, nc));
-                        list.add(new Point(nr, nc));
                     }
                 }
             }
-        }
-        int sum = 0;
-        for(Point p : list) {
-            sum += map[p.r][p.c];
+
+            if(!flag) break;
+            else ans++;
         }
 
-        for(Point p : list) {
-            map[p.r][p.c] = sum / list.size();
-        }
-
-        list.removeAll(list);
+        System.out.println(ans);
     }
-    public static void printMap() {
-        for(int i=0;i<N;i++) {
-            for(int j=0;j<N;j++) {
-                System.out.print(map[i][j] + " ");
+
+    private static void findDFS(int r, int c) {
+        // inductive
+        for(int k=0;k<4;k++) {
+            int nr = r + dr[k];
+            int nc = c + dc[k];
+            // 격자 안에 있고, 최소 최대 거리 안에 있는 값이면 연합 처리해야함
+            if(inRange(nr, nc)) {
+                // 이미 연합에 해당한곳이면 패스
+                if(v[nr][nc]) continue;
+                int curr = Math.abs(map[r][c] - map[nr][nc]);
+
+                if(curr >= L && curr <= R) {
+                    v[nr][nc] = true;
+                    list.add(new Point(nr, nc));
+                    findDFS(nr, nc);
+                }
             }
-            System.out.println();
         }
+    }
+
+    private static void calculate() {
+        int num = 0, cnt = 0;
+        for(Point p : list) {
+            num += map[p.r][p.c];
+            cnt++;
+        }
+
+        int newNum = num / cnt;
+        for(Point p : list) {
+            map[p.r][p.c] = newNum;
+        }
+    }
+
+    private static boolean inRange(int r, int c) {
+        return r >= 0 && r < N && c >= 0 && c < N;
     }
 }
