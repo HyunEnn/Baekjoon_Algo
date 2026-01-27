@@ -1,35 +1,44 @@
 class Solution {
+    static int idx;
+    static int r1, c1;
     public int[] solution(int[] sequence, int k) {
         int[] answer = new int[2];
-        int ans_l = 0, ans_r = 0;
-        int left = 0, right = 0;
-        int sum = 0;
-        int len = Integer.MAX_VALUE;
-        while(right < sequence.length) {
+        int ans = Integer.MAX_VALUE;
+        idx = 0;
+        r1 = 0; c1 = 0;
+        int n = sequence.length;
+        int[] arr = new int[n];
+        int end = 0;
+        arr[0] = sequence[0];
+        if(arr[0] == k) {
+            answer[0] = 0;
+            answer[1] = 0;
+            return answer;
+        }
+        for(int i=1;i<n;i++) {
+            if(sequence[i] <= k) arr[i] = arr[i-1] + sequence[i];
+            else break;
             
-            // sum 이 k 보다 작으면 right를 증가시킨다.
-            if(sum < k) {
-                sum += sequence[right];
-                right++;
-            }
-            // 여기가 sum 이 k보다 크면, 하나씩 줄인다
-            while(sum > k && right > left) {
-                sum -= sequence[left];
-                left++;
-            }
-            
-            if(sum == k) {
-                if(right - left < len) {
-                    len = right - left;
-                    ans_l = left;
-                    ans_r = right - 1;
+            if(arr[i] > k) {
+                while(arr[i] > k) {
+                    arr[i] -= sequence[idx++];
+                    
                 }
-                sum -= sequence[left];
-                left++;
+            }
+            
+            if(arr[i] == k) {
+                end = i;
+                if(ans > (end - idx)) {
+                    ans = end - idx;
+                    r1 = end;
+                    c1 = idx;
+                }
             }
         }
-        answer[0] = ans_l;
-        answer[1] = ans_r;
+        
+        answer[0] = c1;
+        answer[1] = r1;
+        
         return answer;
     }
 }
