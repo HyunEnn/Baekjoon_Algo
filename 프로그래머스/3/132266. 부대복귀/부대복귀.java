@@ -1,70 +1,52 @@
 import java.util.*;
 
 class Solution {
-    static List<Integer>[] list;
-    static boolean[] v;
-    static int ans;
     static class Point {
-        int w, cnt;
-        Point(int w, int cnt) {
-            this.w = w;
-            this.cnt = cnt;
+        int next, time;
+        Point(int next, int time) {
+            this.next = next;
+            this.time = time;
         }
     }
-    
+    static List<Integer>[] list;
+    static Queue<Point> Q;
     public int[] solution(int n, int[][] roads, int[] sources, int destination) {
-        int[] answer = new int[sources.length];
-        list = new ArrayList[n+1];
+        List<Integer> ans = new ArrayList<>();
+        list = new List[n+1];
         for(int i=1;i<=n;i++) {
             list[i] = new ArrayList<>();
         }
+        // [i]가 갈 수 있는 길 리스트 저장
         for(int i=0;i<roads.length;i++) {
-            list[roads[i][0]].add(roads[i][1]);
-            list[roads[i][1]].add(roads[i][0]);
-        }
-        
-        for(int i=0;i<sources.length;i++) {
-            v = new boolean[n+1];
-            ans = Integer.MAX_VALUE;
-            int now = sources[i];
-            v[now] = true;
-            
-            if(now == destination) answer[i] = 0;
-            else {
-                findRoute(destination, now, 0);
-            
-                if(ans == Integer.MAX_VALUE) answer[i] = -1;
-                else answer[i] = ans;
-            }
-        }
-        return answer;
-    }
-    
-    public static void findRoute(int dest, int now, int move) {
+            int f = roads[i][0];
+            int s = roads[i][1];
+            list[f].add(s);
+            list[s].add(f);
+        }  
+        // dest에서 각 위치별로 거리값 갱신
         Queue<Point> Q = new ArrayDeque<>();
-        Q.offer(new Point(now, move));
-        boolean flag = false;
+        Q.offer(new Point(destination, 0));
+        
+        int[] dist = new int[n+1];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[destination] = 0;
         
         while(!Q.isEmpty()) {
             Point p = Q.poll();
-            for(int c : list[p.w]) {
-                // 방문하지 않은 길은 체크하고 Q에 추가
-                // 가는 곳이 목적지라면? 바로 종료
-                if(!v[c]) {
-                    if(c == dest) {
-                        flag = true;
-                        break;
-                    }
-                    else {
-                        v[c] = true;
-                        Q.offer(new Point(c, p.cnt + 1));
-                    }
+            int curr = p.next;
+            
+            for(int c : list[curr]) {
+                if(dist[c] > p.time + 1) {
+                    dist[c] = p.time + 1;
+                    Q.offer(new Point(c, p.time + 1));
                 }
             }
-            if(flag) {
-                ans = p.cnt + 1;
-                break;
-            }
+        }     
+        int[] answer = new int[sources.length];
+        for(int i=0;i<answer.length;i++) {
+            if(dist[sources[i]] == Integer.MAX_VALUE) answer[i] = -1;
+            else answer[i] = dist[sources[i]];
         }
+        return answer;
     }
 }
