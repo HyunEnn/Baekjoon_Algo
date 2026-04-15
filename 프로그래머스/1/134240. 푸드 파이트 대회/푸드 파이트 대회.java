@@ -1,29 +1,32 @@
+import java.util.*;
+
 class Solution {
+    static Queue<Integer> QA = new ArrayDeque<>();
+    static Deque<Integer> QB = new ArrayDeque<>();
     public String solution(int[] food) {
         String answer = "";
-        StringBuilder sb = new StringBuilder();
         for(int i=1;i<food.length;i++) {
-            if(food[i] / 2 > 0) {
-                int rec = food[i] / 2;
-                for(int j=0;j<rec;j++) {
-                    sb.append(i);
-                }
-            }
-        }
-        sb.append(0); // 왼쪽 주자 끝
-        for(int i=food.length-1;i>0;i--) {
-            if(food[i] / 2 > 0) {
-                int rec = food[i] / 2;
-                for(int j=0;j<rec;j++) {
-                    sb.append(i);
-                }
+            int idx = food[i] / 2;
+            for(int j=0;j<idx;j++) {
+                QA.offer(i); QB.offerFirst(i);
             }
         }
         
-        System.out.println(sb.toString());
+//         for(int i : QB) {
+//             System.out.print(i);
+//         }
         
-        // food 는 4가 고정임
-        return sb.toString();
+//         System.out.println();
         
+        StringBuilder sb = new StringBuilder();
+        while(!QA.isEmpty()) {
+            sb.append(QA.poll()+"");
+        } sb.append("0");
+        while(!QB.isEmpty()) {
+            sb.append(QB.poll()+"");
+        }
+        // System.out.println(sb.toString());
+        answer = sb.toString();
+        return answer;
     }
 }
