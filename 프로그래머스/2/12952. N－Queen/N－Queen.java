@@ -1,9 +1,16 @@
 import java.util.*;
 
 class Solution {
-    static int n, answer;
+    static class Point {
+        int r, c;
+        Point(int r, int c) {
+            this.r = r;
+            this.c = c;
+        }
+    }
     static boolean[] v;
-    static List<Integer> list = new ArrayList<>();
+    static List<Point> list = new ArrayList<>();
+    static int answer;
     public int solution(int n) {
         answer = 0;
         v = new boolean[n];
@@ -11,31 +18,31 @@ class Solution {
         return answer;
     }
     
-    private static void dfs(int idx, int n) {
+    public static void dfs(int idx, int n) {
         // basis
         if(idx == n) {
             answer++;
-            // System.out.println(list);
             return;
         }
+        
         // inductive
         for(int i=0;i<n;i++) {
             if(v[i]) continue;
-            
+            // 놓을수 있는지 체크
             if(possible(idx, i)) {
                 v[i] = true;
-                list.add(i);
+                list.add(new Point(idx, i));
                 dfs(idx + 1, n);
-                list.remove(list.size() - 1);
                 v[i] = false;
+                list.remove(list.size() - 1);
             }
         }
     }
     
-    private static boolean possible(int r, int c) {
-        for(int row = 0;row < list.size(); row++) {
-            int col = list.get(row);
-            if(Math.abs(r - row) == Math.abs(c - col)) return false;
+    public static boolean possible(int r, int c) {
+        for(Point p : list) {
+            int diff = r - p.r;
+            if(p.c - diff == c || p.c + diff == c) return false;
         }
         return true;
     }
