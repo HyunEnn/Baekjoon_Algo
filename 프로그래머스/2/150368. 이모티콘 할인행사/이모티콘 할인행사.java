@@ -16,17 +16,17 @@ class Solution {
         if(list.size() == n) {
             // 가능한 조합들 기준에서, 구매할 수 있는 최대값 저장?
             // 예시로, 1번 유저는 40% 이상, 2번은 25% 이상 할인하는걸 모두 구매한다.
-            for(int i : list) {
-                int[] tmp = solve(users, emoticons);
-                // 여기서, 계산된 구독자 수가 더 많으면 전체 변경
-                if(tmp[0] > answer[0]) {
-                    answer = tmp;
-                }
-                // 구독자 수가 동일하다면, 합산값 비교
-                else if(tmp[0] == answer[0]) {
-                    answer[1] = Math.max(answer[1], tmp[1]);
-                }
+            
+            int[] tmp = solve(users, emoticons);
+            // 여기서, 계산된 구독자 수가 더 많으면 전체 변경
+            if(tmp[0] > answer[0]) {
+                answer = tmp;
             }
+            // 구독자 수가 동일하다면, 합산값 비교
+            else if(tmp[0] == answer[0]) {
+                answer[1] = Math.max(answer[1], tmp[1]);
+            }
+            
             return;
         }
         // inductive , 처음부터 필요한 조합만 한다?
