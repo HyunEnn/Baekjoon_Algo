@@ -1,52 +1,72 @@
 import java.util.*;
 
 class Solution {
-    static int[] rates = {10, 20, 30, 40};
+    static int[] rate = {40, 30, 20, 10};
     static List<Integer> list = new ArrayList<>();
-    static int bestCnt, bestSell;
+    static int[] answer;
     public int[] solution(int[][] users, int[] emoticons) {
-        int[] answer = new int[2];
-        int[] arr = new int[emoticons.length];
-        comb(arr, users, emoticons, 0);
-        answer[0] = bestCnt;
-        answer[1] = bestSell;
+        answer = new int[2];
+        // 할인은, 10,20,30,40 프로로 조합을 고려해야함.
+        recursive(0, emoticons.length, emoticons, users);
         return answer;
     }
     
-    public static void comb(int[] arr, int[][] users, int[] emoticons, int idx) {
+    public static void recursive(int idx, int n, int[] emoticons, int[][] users) {
         // basis
-        if(idx == emoticons.length) {
-            calculate(arr, users, emoticons);
-            return;
-        }
-        // inductive
-        for(int i=0;i<rates.length;i++) {
-            arr[idx] = rates[i];
-            comb(arr, users, emoticons, idx + 1);
-        }
-    }
-    // 모든 가능한 조합의 이모티콘 할인율을 구해놓고, 현재 할인율에 대해서, 처리가 불가능한 경우면 스킵하고, 처리한다?
-    public static void calculate(int[] arr, int[][] users, int[] emoticons) {
-        int cnt = 0;
-        int sell = 0;
-        for(int i=0;i<users.length;i++) {
-            int curr = 0;
-            int rate = users[i][0]; // 설정된 할인 비율
-            // 배열이 현재 이모티콘 할인율, 따라서 현재 설정한 할인율보다 높으면 구매한다.
-            for(int j=0;j<arr.length;j++) {
-                if(arr[j] >= rate) {
-                    curr += (int) Math.round(emoticons[j] * (1.0 - (arr[j] * 0.01)));
+        if(list.size() == n) {
+            // 가능한 조합들 기준에서, 구매할 수 있는 최대값 저장?
+            // 예시로, 1번 유저는 40% 이상, 2번은 25% 이상 할인하는걸 모두 구매한다.
+            for(int i : list) {
+                int[] tmp = solve(users, emoticons);
+                // 여기서, 계산된 구독자 수가 더 많으면 전체 변경
+                if(tmp[0] > answer[0]) {
+                    answer = tmp;
+                }
+                // 구독자 수가 동일하다면, 합산값 비교
+                else if(tmp[0] == answer[0]) {
+                    answer[1] = Math.max(answer[1], tmp[1]);
                 }
             }
-            // curr 의 값이 user의 설정 값보다 높으면, cnt++
-            if(curr >= users[i][1]) cnt++;
-            else sell += curr;
+            return;
         }
-        
-        // 
-        if (cnt > bestCnt || (cnt == bestCnt && sell > bestSell)) {
-            bestCnt = cnt;
-            bestSell = sell;
+        // inductive , 처음부터 필요한 조합만 한다?
+        for(int i=0;i<4;i++) {
+            list.add(rate[i]);
+            recursive(idx + 1, n, emoticons, users);
+            list.remove(list.size() - 1);
         }
     }
+    
+    public static int[] solve(int[][] users, int[] emoticons) {
+        int[] res = new int[2];
+        // 유저별 순서대로 최대값을 구해본다. 어차피, 이모티콘 구독이 최우선임.
+        int[] ans = new int[users.length];
+        for(int i=0;i<users.length;i++) {
+            int sum = 0;
+            // 모든 품목을 다 탐색하면서 최대값 구하기
+            for(int j=0;j<list.size();j++) {
+                int curr = list.get(j); // 현재 적용 할인율
+                if(curr >= users[i][0]) { // 할인율이 유저가 설정한 할인율 이상이면 다 구매
+                    sum += emoticons[j] * (100 - curr) / 100; // 할인된 가격 합산    
+                } 
+            }
+            ans[i] = sum;
+        }
+        
+        // 여기서, 이모티콘 구독 가능한 사람과 그 외에 판매액을 합산하자.
+        for(int i=0;i<ans.length;i++) {
+            if(ans[i] >= users[i][1]) res[0]++;
+            else res[1] += ans[i];
+        }
+        
+        // System.out.println(res[0] + " " + res[1]);
+        
+        return res;
+    }
 }
+
+/*
+ 1. 각 유저는 [할인율, 한도] 으로 총 구매한 가격이 한도를 넘어서면 다 취소하고
+ 이모티콘 플러스 구독으로 전환
+ 2. 만일, 한도 내에 구매했다면 result에서 [이모티콘 구독자 수, 합계]로 리턴한다.
+*/
