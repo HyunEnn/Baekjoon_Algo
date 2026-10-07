@@ -1,44 +1,32 @@
+import java.util.*;
+
 class Solution {
-    static int idx;
-    static int r1, c1;
+    static 
     public int[] solution(int[] sequence, int k) {
         int[] answer = new int[2];
-        int ans = Integer.MAX_VALUE;
-        idx = 0;
-        r1 = 0; c1 = 0;
-        int n = sequence.length;
-        int[] arr = new int[n];
-        int end = 0;
-        arr[0] = sequence[0];
-        if(arr[0] == k) {
-            answer[0] = 0;
-            answer[1] = 0;
-            return answer;
-        }
-        for(int i=1;i<n;i++) {
-            if(sequence[i] <= k) arr[i] = arr[i-1] + sequence[i];
-            else break;
-            
-            if(arr[i] > k) {
-                while(arr[i] > k) {
-                    arr[i] -= sequence[idx++];
-                    
+        int res = Integer.MAX_VALUE;
+        int sum = 0;
+        int left = 0, right = 0;
+        for(int i=0;i<sequence.length;i++) {
+            sum += sequence[i];
+            if(sum > k) {
+                while(sum > k) {
+                    sum -= sequence[left];
+                    left++;
                 }
-            }
-            
-            if(arr[i] == k) {
-                end = i;
-                if(ans > (end - idx)) {
-                    ans = end - idx;
-                    r1 = end;
-                    c1 = idx;
+            } 
+            if(sum == k) {
+                
+                // 같을 때에는, 길이가 짧은 수열을 찾는다.
+                if(res > i - left) {
+                    res = i - left;
+                    answer[0] = left;
+                    answer[1] = i;
                 }
             }
         }
-        
-        answer[0] = c1;
-        answer[1] = r1;
-        
         return answer;
     }
 }
+
+// 시작, 끝 인덱스를 기반으로 슬라이딩 윈도우로 이동 처리?
