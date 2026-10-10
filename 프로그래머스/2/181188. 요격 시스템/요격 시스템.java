@@ -14,7 +14,7 @@ class Solution {
         for(int i=0;i<targets.length;i++) {
             list.add(new Point(targets[i][0], targets[i][1]));
         }
-        list.sort((a, b) -> a.r - b.r); // 오름차순 정렬
+        list.sort((a, b) -> a.c - b.c); // 오름차순 정렬
         int end = list.get(0).c;
         
         for(int i=0;i<list.size();i++) {
@@ -23,15 +23,15 @@ class Solution {
             if(p.r >= end) {
                 answer++;
                 end = p.c;
-            } else {
-                end = Math.min(end, p.c);
             }
         }
         return answer;
     }
 }
 /* 그리디하게, 접근하는 법?
-    [1,4] [3,7] [4,5] [4,8] [5,12] [10,14] [11,13]
+    s 기준 : [1,4] [3,7] [4,5] [4,8] [5,12] [10,14] [11,13]
+    e 기준 : [1,4] [4,5] [3,7] [4,8] [5,12] [11,13] [10,14]
+    // 그냥 if(p.r >= end) answer++; end = p.c;
     
     후보, {1, 3, 4, 5, 10, 11}
     그러면, 순서대로 가능한 선을 그어놓고 그게 안된다면 거기서 자르고 다음걸로 패스하면 된다?
