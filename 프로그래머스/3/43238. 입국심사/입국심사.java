@@ -4,7 +4,7 @@ class Solution {
     public long solution(int n, int[] times) {
         long answer = Long.MAX_VALUE;
         Arrays.sort(times);
-        long end = (long) n * times[0];
+        long end = (long) n * times[times.length - 1];
         long start = 1;
         
         while(start <= end) {
