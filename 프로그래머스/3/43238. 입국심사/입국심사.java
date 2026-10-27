@@ -1,33 +1,30 @@
+import java.util.*;
+
 class Solution {
-    static long time;
     public long solution(int n, int[] times) {
         long answer = Long.MAX_VALUE;
-        long time = 0;
-        for(int i=0;i<times.length;i++) {
-            time = Math.max(time, times[i]);
-        }
+        Arrays.sort(times);
+        long end = (long) n * times[0];
+        long start = 1;
         
-        long left = 0, right = time * n;
-        while(left < right) {
-            long mid = (left + right) / 2;
-            if(solve(n, times, mid)) {
+        while(start <= end) {
+            long mid = (start + end) / 2;
+            long check = solve(mid, times);
+            if(check >= n) {
                 answer = Math.min(answer, mid);
-                right = mid;
-            }
-            else {
-                left = mid + 1;
-            }
+                end = mid - 1;
+            } else {
+                start = mid + 1;
+            } 
         }
         return answer;
     }
     
-    private static boolean solve(int n, int[] times, long mid) {
-        long sum = 0;
+    private static long solve(long mid, int[] times) {
+        long cnt = 0;
         for(int i=0;i<times.length;i++) {
-            sum += mid / times[i];
+            cnt += mid / times[i];
         }
-        
-        return sum >= n;
+        return cnt;
     }
 }
-// 7, 10 이면, 30/7 + 30/10 = 4+3 =7
